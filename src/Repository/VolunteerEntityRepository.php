@@ -35,11 +35,23 @@ class VolunteerEntityRepository extends ServiceEntityRepository
         $volunteer = new VolunteerEntity();
         $volunteer->setEmail($email);
         $volunteer->setPhone($phone);
-        $volunteer->setRoadNumber($roadNumber);
+        $volunteer->setRoadNumber(intval($roadNumber));
         $volunteer->setRoadName($roadName);
         $volunteer->setZip($zip);
 
         $this->_em->persist($volunteer);
+        $this->_em->flush();
+
+    }
+
+    /**
+     * @param VolunteerEntity $volunteerEntity
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function saveVolunteerEntity(VolunteerEntity $volunteerEntity){
+
+        $this->_em->persist($volunteerEntity);
         $this->_em->flush();
 
     }

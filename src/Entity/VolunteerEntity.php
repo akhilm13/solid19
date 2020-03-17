@@ -27,19 +27,24 @@ class VolunteerEntity
     private $phone;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $roadNumber;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $roadName;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $zip;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    private $password;
 
     public function getZip(): ?int
     {
@@ -115,5 +120,21 @@ class VolunteerEntity
         $this->roadName = $roadName;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param mixed $password
+     */
+    public function setPassword($password): void
+    {
+        $this->password = $password;
     }
 }

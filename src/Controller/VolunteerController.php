@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\VolunteerEntity;
 use App\Repository\VolunteerEntityRepository;
 use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class VolunteerController
  * @package App\Controller
- * @Route("/volunteer"")
+ * @Route("/volunteer")
  */
 class VolunteerController extends AbstractController
 {
@@ -24,6 +25,44 @@ class VolunteerController extends AbstractController
     {
         $this->volunteerRepository = $volunteerEntityRepository;
     }
+
+    /**
+     * @Route("/signup", name="volunteerSignUp", methods={"POST"})
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function volunteerSignUpAction(Request $request){
+
+        $volunteerData = json_decode($request->getContent(), true);
+
+        $email = $volunteerData['email'];
+        $phone = $volunteerData['phone'];
+        $password = $volunteerData['password'];
+
+        if (empty($email) || empty($phone) || empty($password)){
+            throw new NotFoundHttpException('Mandatory parameters not found');
+        }
+
+        $volunteer = new VolunteerEntity();
+        $volunteer->setEmail($email);
+        $volunteer->setPhone($phone);
+        $volunteer->setPassword(password_hash($password, PASSWORD_BCRYPT));
+
+        try{
+
+            $this->volunteerRepository->saveVolunteerEntity($volunteer);
+        }catch (ORMException $exception){
+            return new JsonResponse(array(
+                'status' => 'failed'
+            ), Response::HTTP_NOT_IMPLEMENTED);
+        }
+
+        return new JsonResponse(array(
+            'status' => 'success'
+        ), Response::HTTP_CREATED);
+    }
+
+
 
     /**
      * @Route("/create/new", name="createVolunteer", methods={"POST"})
@@ -41,7 +80,7 @@ class VolunteerController extends AbstractController
         $roadName = $data['roadName'];
         $zip = $data['zip'];
 
-        if (empty($email) || empty($phone) || empty($roadNumber) || empty($roadName) || empty(zip)) {
+        if (empty($email) || empty($phone) || empty($roadNumber) || empty($roadName) || empty($zip)) {
             throw new NotFoundHttpException('Missing mandatory parameters');
         }
 
