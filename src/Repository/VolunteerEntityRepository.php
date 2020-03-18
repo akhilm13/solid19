@@ -5,8 +5,10 @@ namespace App\Repository;
 use App\Entity\VolunteerEntity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * @method VolunteerEntity|null find($id, $lockMode = null, $lockVersion = null)
@@ -54,6 +56,25 @@ class VolunteerEntityRepository extends ServiceEntityRepository
         $this->_em->persist($volunteerEntity);
         $this->_em->flush();
 
+    }
+
+
+    /**
+     * @param $latitude
+     * @param $longitude
+     * @return mixed[]
+     * @throws DBALException
+     */
+    public function findNearestVolunteers($latitude, $longitude)
+    {
+        $conn = $this->_em->getConnection();
+        $sql = 'CALL getAllVolunteersWithinLocation(:lat, :lon)';
+
+        $statement = $conn->prepare($sql);
+        $statement->execute(array(':lat' => $latitude, ':lon' => $longitude));
+
+        $volunteerIds = $statement->fetchAll();
+        return $volunteerIds;
     }
 
     // /**

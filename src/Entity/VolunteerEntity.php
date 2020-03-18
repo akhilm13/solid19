@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -27,24 +29,29 @@ class VolunteerEntity
     private $phone;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="decimal", scale=8, precision=10)
      */
-    private $roadNumber;
+    private $latitude;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="decimal", scale=8, precision=10)
      */
-    private $roadName;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $zip;
+    private $longitude;
 
     /**
      * @ORM\Column(type="string")
      */
     private $password;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Lists", mappedBy="volunteerId")
+     */
+    private $lists;
+
+    public function __construct()
+    {
+        $this->lists = new ArrayCollection();
+    }
 
     public function getZip(): ?int
     {
@@ -136,5 +143,65 @@ class VolunteerEntity
     public function setPassword($password): void
     {
         $this->password = $password;
+    }
+
+    /**
+     * @return Collection|Lists[]
+     */
+    public function getLists(): Collection
+    {
+        return $this->lists;
+    }
+
+    public function addList(Lists $list): self
+    {
+        if (!$this->lists->contains($list)) {
+            $this->lists[] = $list;
+            $list->addVolunteerId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeList(Lists $list): self
+    {
+        if ($this->lists->contains($list)) {
+            $this->lists->removeElement($list);
+            $list->removeVolunteerId($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLatitude()
+    {
+        return $this->latitude;
+    }
+
+    /**
+     * @param mixed $latitude
+     */
+    public function setLatitude($latitude): void
+    {
+        $this->latitude = $latitude;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLongitude()
+    {
+        return $this->longitude;
+    }
+
+    /**
+     * @param mixed $longitude
+     */
+    public function setLongitude($longitude): void
+    {
+        $this->longitude = $longitude;
     }
 }
