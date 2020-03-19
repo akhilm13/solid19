@@ -26,6 +26,8 @@ class VolunteerController extends AbstractController
         $this->volunteerRepository = $volunteerEntityRepository;
     }
 
+
+
     /**
      * @Route("/signup", name="volunteerSignUp", methods={"POST"})
      * @param Request $request

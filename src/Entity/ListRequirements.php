@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -18,7 +19,7 @@ class ListRequirements
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Lists")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false,  onDelete="CASCADE")
      */
     private $listId;
 
@@ -36,6 +37,18 @@ class ListRequirements
      * @ORM\Column(type="boolean")
      */
     private $status;
+
+    /**
+     * @ORM\Column(type="string", length=8)
+     * @var string $shopperId
+     */
+    private $shopperId;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @var DateTime $dateTimeChanged
+     */
+    private $dateTimeStatusChanged;
 
     public function getId(): ?int
     {
@@ -87,6 +100,40 @@ class ListRequirements
     {
         $this->status = $status;
 
+        $this->dateTimeStatusChanged = new DateTime('now');
         return $this;
+    }
+
+    public function toArray(){
+
+        return array(
+            'id' => $this->id,
+            'listItem' => $this->listItem,
+            'quantity' => $this->quantity
+        );
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getDateTimeStatusChanged(): DateTime
+    {
+        return $this->dateTimeStatusChanged;
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopperId(): string
+    {
+        return $this->shopperId;
+    }
+
+    /**
+     * @param string $shopperId
+     */
+    public function setShopperId(string $shopperId): void
+    {
+        $this->shopperId = $shopperId;
     }
 }

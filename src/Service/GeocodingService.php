@@ -12,7 +12,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class GeocodingService
 {
-    private const KEY = 'removed';
+    private const KEY = 'ZIZdsYSp8MtY7zovW5OUf4TlzOiMBF7m';
     private $baseUrl = 'http://www.mapquestapi.com/geocoding/v1/address?';
 
     /**

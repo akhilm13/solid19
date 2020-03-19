@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,6 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class VolunteerEntity
 {
+
+
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -44,6 +48,12 @@ class VolunteerEntity
     private $password;
 
     /**
+     * @ORM\Column(type="datetime")
+     * @var DateTime $createdAt
+     */
+    private $createdAt;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Lists", mappedBy="volunteerId")
      */
     private $lists;
@@ -51,19 +61,9 @@ class VolunteerEntity
     public function __construct()
     {
         $this->lists = new ArrayCollection();
+        $this->createdAt = new DateTime('now');
     }
 
-    public function getZip(): ?int
-    {
-        return $this->zip;
-    }
-
-    public function setZip(int $zip): self
-    {
-        $this->zip = $zip;
-
-        return $this;
-    }
 
     public function toArray()
     {
@@ -71,8 +71,6 @@ class VolunteerEntity
             'id' => $this->getId(),
             'email' => $this->getEmail(),
             'phone' => $this->getPhone(),
-            'roadNumber' => $this->getRoadNumber(),
-            'roadName' => $this->getRoadName()
         );
     }
 
@@ -105,29 +103,7 @@ class VolunteerEntity
         return $this;
     }
 
-    public function getRoadNumber(): ?int
-    {
-        return $this->roadNumber;
-    }
 
-    public function setRoadNumber(int $roadNumber): self
-    {
-        $this->roadNumber = $roadNumber;
-
-        return $this;
-    }
-
-    public function getRoadName(): ?string
-    {
-        return $this->roadName;
-    }
-
-    public function setRoadName(string $roadName): self
-    {
-        $this->roadName = $roadName;
-
-        return $this;
-    }
 
     /**
      * @return mixed
@@ -203,5 +179,13 @@ class VolunteerEntity
     public function setLongitude($longitude): void
     {
         $this->longitude = $longitude;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
     }
 }

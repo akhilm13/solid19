@@ -31,8 +31,21 @@ class ListOrdersController extends AbstractController
     }
 
     /**
+     * @Route("/getOrders/lat/{latitude}/lon/{longitude}", name="getOrdersWithLatLon", methods={"GET"})
+     * @param ListsService $listsService
+     * @param $latitude
+     * @param $longitude
+     * @return mixed
+     */
+    public function getOrdersWithLatLon(ListsService $listsService, $latitude, $longitude)
+    {
+        return $this->getNearestListOrders($listsService, $latitude, $longitude);
+    }
+
+
+    /**
      *
-     * @Route("/getOrders/street/{street}/city/{city}/country/{country}/postal/{postal}", name="getOrders", methods={"GET"})
+     * @Route("/getOrders/street/{street}/city/{city}/country/{country}/postal/{postal}", name="getOrdersWithAddress", methods={"GET"})
      * @param GeocodingService $geocodingService
      * @param ListsService $listsService
      * @param $street
@@ -40,9 +53,9 @@ class ListOrdersController extends AbstractController
      * @param $country
      * @param $postal
      * @return JsonResponse
-     * @throws DBALException
      */
-    public function getOrders(GeocodingService $geocodingService, ListsService $listsService, $street, $city, $country, $postal)
+    public
+    function getOrdersWithAddress(GeocodingService $geocodingService, ListsService $listsService, $street, $city, $country, $postal)
     {
 
         //fixme implement catch
@@ -63,15 +76,35 @@ class ListOrdersController extends AbstractController
         $latitude = $coordinates['latitude'];
         $longitude = $coordinates['longitude'];
 
-        $nearestVolunteersList = $this->volunteerRepository->findNearestVolunteers($latitude,$longitude);
-        $listArray = $listsService->getAllListsByVolunteers($nearestVolunteersList);
 
-        if (empty($listArray)){
-            return  new JsonResponse(array(
+        return $this->getNearestListOrders($listsService, $latitude, $longitude);
+
+
+    }
+
+    /**
+     * @param ListsService $listsService
+     * @param $latitude
+     * @param $longitude
+     * @return mixed
+     */
+    private
+    function getNearestListOrders(ListsService $listsService, $latitude, $longitude)
+    {
+
+        try {
+            $nearestVolunteersList = $this->volunteerRepository->findNearestVolunteers($latitude, $longitude);
+            $listArray = $listsService->getAllListsByVolunteers($nearestVolunteersList);
+        } catch (DBALException $e) {
+            $listArray = array();
+        }
+
+        if (empty($listArray)) {
+            return new JsonResponse(array(
                 'status' => 'No results found'
             ), Response::HTTP_NOT_FOUND);
         }
-        return  new JsonResponse($listArray, Response::HTTP_OK);
+        return new JsonResponse($listArray, Response::HTTP_OK);
 
     }
 
@@ -96,7 +129,7 @@ class ListOrdersController extends AbstractController
     }
 
     /**
-     * @Route("/removeItem/{listItemId}")
+     * @Route("/removeItem/{listItemId}", name="deleteListItem")
      * @param $listItemId
      * @param ListsService $listsService
      * @return JsonResponse
@@ -109,5 +142,47 @@ class ListOrdersController extends AbstractController
         return new JsonResponse(array(
             'status' => 'deleted'
         ), Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/listItem/{listItemId}", name="getItem", methods={"GET"})
+     * @param $listItemId
+     * @return JsonResponse
+     */
+    public
+    function getItem($listItemId)
+    {
+
+        $item = $this->listRequirementsRepository->find($listItemId);
+
+        if (!$item) {
+            return new JsonResponse(array(
+                'status' => 'Item not found'
+            ), Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($item->toArray(), Response::HTTP_FOUND);
+    }
+
+    /**
+     * @Route("/list/{listId}", name="getList", methods={"GET"})
+     * @param ListsService $listsService
+     * @param $listId
+     * @return JsonResponse
+     */
+    public
+    function getList(ListsService $listsService, $listId)
+    {
+        $listItems = $listsService->getAllItemsInList($listId);
+
+        if (!$listItems) {
+            return new JsonResponse(array(
+                'status' => 'List not found'
+            ), Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($listItems, Response::HTTP_FOUND);
+
+
     }
 }

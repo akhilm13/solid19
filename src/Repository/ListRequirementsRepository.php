@@ -71,7 +71,7 @@ class ListRequirementsRepository extends ServiceEntityRepository
 
         return array_reduce($results,
             function ($list, $result) {
-                $list[$result->getListId()->getId()]['orders'][] = array('product' => $result->getListItem(), 'quantity' => $result->getQuantity());
+                $list[$result->getListId()->getId()]['orders'][] = array('id' => $result->getId(), 'product' => $result->getListItem(), 'quantity' => $result->getQuantity());
                 $list[$result->getListId()->getId()]['volunteer'] = $result->getListId()->getVolunteerId()->getPhone();
                 return $list;
             }, []

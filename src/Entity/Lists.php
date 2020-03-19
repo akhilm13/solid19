@@ -21,6 +21,7 @@ class Lists
     /**
      * @var VolunteerEntity $volunteerId
      * @ORM\ManyToOne(targetEntity="App\Entity\VolunteerEntity", inversedBy="lists")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $volunteerId;
 
