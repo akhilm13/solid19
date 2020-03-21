@@ -54,8 +54,7 @@ class ListOrdersController extends AbstractController
      * @param $postal
      * @return JsonResponse
      */
-    public
-    function getOrdersWithAddress(GeocodingService $geocodingService, ListsService $listsService, $street, $city, $country, $postal)
+    public function getOrdersWithAddress(GeocodingService $geocodingService, ListsService $listsService, $street, $city, $country, $postal)
     {
 
         //fixme implement catch
@@ -88,8 +87,7 @@ class ListOrdersController extends AbstractController
      * @param $longitude
      * @return mixed
      */
-    private
-    function getNearestListOrders(ListsService $listsService, $latitude, $longitude)
+    private function getNearestListOrders(ListsService $listsService, $latitude, $longitude)
     {
 
         try {
@@ -109,18 +107,41 @@ class ListOrdersController extends AbstractController
     }
 
     /**
-     * @Route("/updateStatus/{listItemId}", name="updateStatus", methods={"DELETE", "POST"})
+     * @Route("/updateStatus/{listItemId}/token/{token}", name="updateStatus", methods={"DELETE", "POST"})
      * @param Request $request
      * @param $listItemId
      * @param ListsService $listsService
+     * @param $token
      * @return JsonResponse
      */
-    public function updateStatusOfListItem(Request $request, $listItemId, ListsService $listsService)
+    public function updateStatusOfListItem(Request $request, $listItemId, ListsService $listsService, $token)
     {
+        //fixme implement token and set current time
+
         if ($request->getMethod() == "POST") {
-            $listsService->updateListItemStatus($listItemId, 'required');
+            $item = $listsService->getItemAndCheckToken($token, $listItemId);
+
+            if ($item === null) {
+                return new JsonResponse(array(
+                    'status' => 'Item not found'
+                ), Response::HTTP_NOT_FOUND);
+            }
+
+            if ($item === false) {
+                return new JsonResponse(array(
+                    'status' => 'Token not authorised'
+                ), Response::HTTP_FORBIDDEN);
+            }
+            try {
+                $listsService->updateListItemStatus($listItemId, 'required');
+            } catch (ORMException $exception) {
+
+            }
         } else {
-            $listsService->updateListItemStatus($listItemId, 'serviced');
+            try {
+                $listsService->updateListItemStatus($listItemId, 'serviced', $token);
+            } catch (ORMException $e) {
+            }
         }
 
         return new JsonResponse(array(
@@ -149,8 +170,7 @@ class ListOrdersController extends AbstractController
      * @param $listItemId
      * @return JsonResponse
      */
-    public
-    function getItem($listItemId)
+    public function getItem($listItemId)
     {
 
         $item = $this->listRequirementsRepository->find($listItemId);
@@ -165,13 +185,63 @@ class ListOrdersController extends AbstractController
     }
 
     /**
+     * @Route("/list/addNew", name="addList", methods={"POST"})
+     * @param Request $request
+     * @param ListsService $listsService
+     * @return JsonResponse
+     */
+    public function addList(Request $request, ListsService $listsService)
+    {
+        $volunteerId = json_decode($request->getContent(), true)['id'];
+        try {
+            $listsService->createNewList($volunteerId);
+        } catch (ORMException $e) {
+            return new JsonResponse(array(
+                'status' => 'Could not create list'
+            ), Response::HTTP_NOT_IMPLEMENTED);
+        }
+
+        return new JsonResponse(array(
+            'status' => 'List Created'
+        ), Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/listItem/addNew", name="addListItem", methods={"POST"})
+     * @param Request $request
+     * @param ListsService $listsService
+     * @return JsonResponse
+     */
+    public function addListItem(Request $request, ListsService $listsService)
+    {
+
+        $listContent = json_decode($request->getContent(), true);
+
+        $listItemName = $listContent['listItem'];
+        $listItemListId = $listContent['listId'];
+        $listItemQuantity = $listContent['quantity'];
+
+        try {
+            $listsService->createNewListItem($listItemListId, $listItemQuantity, $listItemName);
+        } catch (ORMException $e) {
+            return new JsonResponse(array(
+                'status' => 'Could not create item'
+            ), Response::HTTP_NOT_IMPLEMENTED);
+        }
+
+        return new JsonResponse(array(
+            'status' => 'List Item Created'
+        ), Response::HTTP_OK);
+
+    }
+
+    /**
      * @Route("/list/{listId}", name="getList", methods={"GET"})
      * @param ListsService $listsService
      * @param $listId
      * @return JsonResponse
      */
-    public
-    function getList(ListsService $listsService, $listId)
+    public function getList(ListsService $listsService, $listId)
     {
         $listItems = $listsService->getAllItemsInList($listId);
 
@@ -182,7 +252,24 @@ class ListOrdersController extends AbstractController
         }
 
         return new JsonResponse($listItems, Response::HTTP_FOUND);
+    }
 
+    /**
+     * @Route("/lists/volunteer/{id}", name="getListsByVolunteer", methods={"GET"})
+     * @param ListsService $listsService
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getAllListByVolunteer(ListsService $listsService, $id)
+    {
+        $listItems = $listsService->getAllListsByVolunteerId($id);
 
+        if (empty($lists)){
+            return new JsonResponse(array(
+                'status' => 'No Lists Found'
+            ), Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($listItems, Response::HTTP_FOUND);
     }
 }

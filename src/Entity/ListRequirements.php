@@ -136,4 +136,6 @@ class ListRequirements
     {
         $this->shopperId = $shopperId;
     }
+
+
 }

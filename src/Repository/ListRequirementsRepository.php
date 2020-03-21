@@ -91,4 +91,15 @@ class ListRequirementsRepository extends ServiceEntityRepository
         $this->_em->remove($listItem);
         $this->_em->flush();
     }
+
+    /**
+     * @param ListRequirements $listRequirements
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function  saveListItem(ListRequirements $listRequirements){
+
+        $this->_em->persist($listRequirements);
+        $this->_em->flush();
+    }
 }

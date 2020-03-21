@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Lists;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 
 /**
  * @method Lists|null find($id, $lockMode = null, $lockVersion = null)
@@ -56,5 +58,16 @@ class ListsRepository extends ServiceEntityRepository
             ->getQuery();
 
         return $query->getResult();
+    }
+
+    /**
+     * @param Lists $list
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function saveList(Lists $list)
+    {
+        $this->_em->persist($list);
+        $this->_em->flush();
     }
 }
