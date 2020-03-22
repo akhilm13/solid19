@@ -13,8 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 class VolunteerEntity
 {
 
-
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -33,25 +31,37 @@ class VolunteerEntity
     private $phone;
 
     /**
-     * @ORM\Column(type="decimal", scale=8, precision=10)
+     * @ORM\Column(type="decimal", scale=8, precision=10, nullable=true)
      */
     private $latitude;
 
     /**
-     * @ORM\Column(type="decimal", scale=8, precision=10)
+     * @ORM\Column(type="decimal", scale=8, precision=10, nullable=true)
      */
     private $longitude;
 
     /**
      * @ORM\Column(type="string")
      */
-    private $password;
+    private $token;
 
     /**
      * @ORM\Column(type="datetime")
      * @var DateTime $createdAt
      */
     private $createdAt;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var string $messageToShoppers
+     */
+    private $messageToShoppers;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var string $messageToOtherVolunteers
+     */
+    private $messageToOtherVolunteers;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Lists", mappedBy="volunteerId")
@@ -103,22 +113,20 @@ class VolunteerEntity
         return $this;
     }
 
-
-
     /**
      * @return mixed
      */
-    public function getPassword()
+    public function getToken()
     {
-        return $this->password;
+        return $this->token;
     }
 
     /**
-     * @param mixed $password
+     * @param mixed $token
      */
-    public function setPassword($password): void
+    public function setToken($token): void
     {
-        $this->password = $password;
+        $this->token = $token;
     }
 
     /**
@@ -187,5 +195,37 @@ class VolunteerEntity
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessageToShoppers(): string
+    {
+        return $this->messageToShoppers;
+    }
+
+    /**
+     * @param string $messageToShoppers
+     */
+    public function setMessageToShoppers(string $messageToShoppers): void
+    {
+        $this->messageToShoppers = $messageToShoppers;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessageToOtherVolunteers(): string
+    {
+        return $this->messageToOtherVolunteers;
+    }
+
+    /**
+     * @param string $messageToOtherVolunteers
+     */
+    public function setMessageToOtherVolunteers(string $messageToOtherVolunteers): void
+    {
+        $this->messageToOtherVolunteers = $messageToOtherVolunteers;
     }
 }

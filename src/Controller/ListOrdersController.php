@@ -6,6 +6,7 @@ use App\Repository\ListRequirementsRepository;
 use App\Repository\VolunteerEntityRepository;
 use App\Service\GeocodingService;
 use App\Service\ListsService;
+use App\Service\VolunteerService;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -44,7 +45,6 @@ class ListOrdersController extends AbstractController
 
 
     /**
-     *
      * @Route("/getOrders/street/{street}/city/{city}/country/{country}/postal/{postal}", name="getOrdersWithAddress", methods={"GET"})
      * @param GeocodingService $geocodingService
      * @param ListsService $listsService
@@ -102,7 +102,7 @@ class ListOrdersController extends AbstractController
                 'status' => 'No results found'
             ), Response::HTTP_NOT_FOUND);
         }
-        return new JsonResponse($listArray, Response::HTTP_OK);
+        return new JsonResponse($listArray, Response::HTTP_FOUND);
 
     }
 
@@ -150,7 +150,7 @@ class ListOrdersController extends AbstractController
     }
 
     /**
-     * @Route("/removeItem/{listItemId}", name="deleteListItem")
+     * @Route("/removeItem/{listItemId}", name="deleteListItem", methods={"DELETE"})
      * @param $listItemId
      * @param ListsService $listsService
      * @return JsonResponse
@@ -184,75 +184,6 @@ class ListOrdersController extends AbstractController
         return new JsonResponse($item->toArray(), Response::HTTP_FOUND);
     }
 
-    /**
-     * @Route("/list/addNew", name="addList", methods={"POST"})
-     * @param Request $request
-     * @param ListsService $listsService
-     * @return JsonResponse
-     */
-    public function addList(Request $request, ListsService $listsService)
-    {
-        $volunteerId = json_decode($request->getContent(), true)['id'];
-        try {
-            $listsService->createNewList($volunteerId);
-        } catch (ORMException $e) {
-            return new JsonResponse(array(
-                'status' => 'Could not create list'
-            ), Response::HTTP_NOT_IMPLEMENTED);
-        }
-
-        return new JsonResponse(array(
-            'status' => 'List Created'
-        ), Response::HTTP_OK);
-    }
-
-    /**
-     * @Route("/listItem/addNew", name="addListItem", methods={"POST"})
-     * @param Request $request
-     * @param ListsService $listsService
-     * @return JsonResponse
-     */
-    public function addListItem(Request $request, ListsService $listsService)
-    {
-
-        $listContent = json_decode($request->getContent(), true);
-
-        $listItemName = $listContent['listItem'];
-        $listItemListId = $listContent['listId'];
-        $listItemQuantity = $listContent['quantity'];
-
-        try {
-            $listsService->createNewListItem($listItemListId, $listItemQuantity, $listItemName);
-        } catch (ORMException $e) {
-            return new JsonResponse(array(
-                'status' => 'Could not create item'
-            ), Response::HTTP_NOT_IMPLEMENTED);
-        }
-
-        return new JsonResponse(array(
-            'status' => 'List Item Created'
-        ), Response::HTTP_OK);
-
-    }
-
-    /**
-     * @Route("/list/{listId}", name="getList", methods={"GET"})
-     * @param ListsService $listsService
-     * @param $listId
-     * @return JsonResponse
-     */
-    public function getList(ListsService $listsService, $listId)
-    {
-        $listItems = $listsService->getAllItemsInList($listId);
-
-        if (!$listItems) {
-            return new JsonResponse(array(
-                'status' => 'List not found'
-            ), Response::HTTP_NOT_FOUND);
-        }
-
-        return new JsonResponse($listItems, Response::HTTP_FOUND);
-    }
 
     /**
      * @Route("/lists/volunteer/{id}", name="getListsByVolunteer", methods={"GET"})
@@ -260,7 +191,7 @@ class ListOrdersController extends AbstractController
      * @param $id
      * @return JsonResponse
      */
-    public function getAllListByVolunteer(ListsService $listsService, $id)
+/*    public function getAllListByVolunteer(ListsService $listsService, $id)
     {
         $listItems = $listsService->getAllListsByVolunteerId($id);
 
@@ -271,5 +202,23 @@ class ListOrdersController extends AbstractController
         }
 
         return new JsonResponse($listItems, Response::HTTP_FOUND);
+    }*/
+
+    /**
+     * @Route("/getMessage/{id}", name="getMessageToShoppers", methods={"GET"})
+     * @param VolunteerService $volunteerService
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getMessageToShoppers(VolunteerService $volunteerService, $id){
+
+        $message = $volunteerService->getMessageToShoppers($id);
+
+        return new JsonResponse(array(
+            'message' => $message
+        ), Response::HTTP_FOUND);
+
+
     }
+
 }

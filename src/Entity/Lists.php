@@ -25,6 +25,12 @@ class Lists
      */
     private $volunteerId;
 
+    /**
+     * @ORM\Column(type="string")
+     * @var string $listName
+     */
+    private $listName;
+
     public function __construct()
     {
         $this->volunteerId = new ArrayCollection();
@@ -49,6 +55,22 @@ class Lists
     public function setVolunteerId(VolunteerEntity $volunteerId): void
     {
         $this->volunteerId = $volunteerId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getListName(): string
+    {
+        return $this->listName;
+    }
+
+    /**
+     * @param string $listName
+     */
+    public function setListName(string $listName): void
+    {
+        $this->listName = $listName;
     }
 
 

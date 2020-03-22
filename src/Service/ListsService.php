@@ -8,6 +8,7 @@ use App\Entity\ListRequirements;
 use App\Entity\Lists;
 use App\Repository\ListRequirementsRepository;
 use App\Repository\ListsRepository;
+use App\Repository\VolunteerEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 
@@ -15,11 +16,13 @@ class ListsService
 {
     private $listRequirementsRepository;
     private $listsRepository;
+    private $volunteerRepository;
 
-    public function __construct(ListsRepository $listsRepository, ListRequirementsRepository $listRequirementsRepository)
+    public function __construct(ListsRepository $listsRepository, ListRequirementsRepository $listRequirementsRepository, VolunteerEntityRepository $volunteerRepository)
     {
         $this->listRequirementsRepository = $listRequirementsRepository;
         $this->listsRepository = $listsRepository;
+        $this->volunteerRepository = $volunteerRepository;
     }
 
 
@@ -45,7 +48,11 @@ class ListsService
         $listItems = $this->listRequirementsRepository->findBy(array('listId' => $list));
         $listItems = $this->formatListItems($listItems);
 
-        return $listItems;
+        $returnList = array(
+            'listName' => $list->getListName(),
+            'orders' => $listItems
+        );
+        return $returnList;
     }
 
     public function getItemAndCheckToken($token, $itemId)
@@ -83,8 +90,6 @@ class ListsService
         }
 
         $this->listRequirementsRepository->saveListItem($listItem);
-
-
     }
 
     /**
@@ -110,13 +115,15 @@ class ListsService
 
     /**
      * @param $volunteerId
+     * @param $listName
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function createNewList($volunteerId)
+    public function createNewList($volunteerId, $listName)
     {
         $list = new Lists();
-        $list->setVolunteerId($volunteerId);
+        $list->setVolunteerId($this->volunteerRepository->find($volunteerId));
+        $list->setListName($listName);
         $this->listsRepository->saveList($list);
     }
 
@@ -136,7 +143,6 @@ class ListsService
         $listsArray = $this->listsRepository->getListsByVolunteers(array($volunteerId));
         $listItems = $this->listRequirementsRepository->getAllListItemsInList($listsArray);
         return $listItems;
-
     }
 
 

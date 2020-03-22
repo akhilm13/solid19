@@ -71,6 +71,7 @@ class ListRequirementsRepository extends ServiceEntityRepository
 
         return array_reduce($results,
             function ($list, $result) {
+                $list[$result->getListId()->getId()]['listName'] = $result->getListId()->getListName();
                 $list[$result->getListId()->getId()]['orders'][] = array('id' => $result->getId(), 'product' => $result->getListItem(), 'quantity' => $result->getQuantity());
                 $list[$result->getListId()->getId()]['volunteer'] = $result->getListId()->getVolunteerId()->getPhone();
                 return $list;
@@ -97,7 +98,8 @@ class ListRequirementsRepository extends ServiceEntityRepository
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function  saveListItem(ListRequirements $listRequirements){
+    public function saveListItem(ListRequirements $listRequirements)
+    {
 
         $this->_em->persist($listRequirements);
         $this->_em->flush();

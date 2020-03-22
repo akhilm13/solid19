@@ -105,4 +105,44 @@ class VolunteerEntityRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function checkPassword($email, $password)
+    {
+        $volunteer = $this->findOneBy(array('email' => $email));
+
+        if ($volunteer){
+            return $volunteer->getId();
+        }
+
+        return false;
+    }
+
+    public function checkToken($token)
+    {
+        $isFound = $this->findOneBy(array('token' => $token));
+        if ($isFound){
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getParameters($volunteerId)
+    {
+        $volunteer = $this->find($volunteerId);
+
+        if (!$volunteer){
+            return array();
+        }
+        $contact = $volunteer->getPhone();
+        $messageToShoppers = $volunteer->getMessageToShoppers();
+        $messageToVolunteers = $volunteer->getMessageToOtherVolunteers();
+
+        $parameters = array(
+            'contact' => $contact,
+            'messageToShoppers' => $messageToShoppers,
+            'messageToVolunteers' => $messageToVolunteers
+        );
+
+        return $parameters;
+    }
 }
