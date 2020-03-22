@@ -110,7 +110,12 @@ class VolunteerEntityRepository extends ServiceEntityRepository
         $volunteer = $this->findOneBy(array('email' => $email));
 
         if ($volunteer){
-            return $volunteer->getId();
+            password_verify($password, $volunteer->getToken());
+            return array(
+                'id' => $volunteer->getId(),
+                'token' => $volunteer->getToken()
+            );
+
         }
 
         return false;

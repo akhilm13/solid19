@@ -20,14 +20,10 @@ class VolunteerService
 
     public function authenticateVolunteer($email, $password){
 
-        $password = password_hash($password, PASSWORD_BCRYPT);
         $isAuth = $this->volunteerRepository->checkPassword($email, $password);
 
         if ($isAuth !== false){
-            return array(
-                'id' => $isAuth,
-                'token' => $password
-            );
+            return $isAuth;
         }
 
         return false;

@@ -39,7 +39,7 @@ class ListRequirements
     private $status;
 
     /**
-     * @ORM\Column(type="string", length=8)
+     * @ORM\Column(type="string", length=8, nullable=true)
      * @var string $shopperId
      */
     private $shopperId;

@@ -49,7 +49,7 @@ class VolunteerController extends AbstractController
         $volunteer = new VolunteerEntity();
         $volunteer->setEmail($email);
         $volunteer->setPhone($phone);
-        $volunteer->setToken(password_hash($password, PASSWORD_BCRYPT));
+        $volunteer->setToken(password_hash($password, PASSWORD_DEFAULT));
 
         try{
 

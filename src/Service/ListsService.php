@@ -129,13 +129,14 @@ class ListsService
 
     public function createNewListItem($listId, $quantity, $listItem)
     {
-        $listItem = new ListRequirements();
-        $listItem->setListId($listId);
-        $listItem->setStatus(false);
-        $listItem->setQuantity($quantity);
-        $listItem->setListItem($listItem);
+        $newListItem = new ListRequirements();
+        $list = $this->listsRepository->find($listId);
+        $newListItem->setListId($list);
+        $newListItem->setStatus(false);
+        $newListItem->setQuantity($quantity);
+        $newListItem->setListItem($listItem);
 
-        $this->listRequirementsRepository->saveListItem($listItem);
+        $this->listRequirementsRepository->saveListItem($newListItem);
     }
 
     public function getAllListsByVolunteerId($volunteerId)
