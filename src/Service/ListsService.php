@@ -83,7 +83,7 @@ class ListsService
 
         if ($status === 'required') {
             $listItem->setStatus(false);
-            $listItem->setShopperId(null);
+            $listItem->setShopperId("");
         } else {
             $listItem->setStatus(true);
             $listItem->setShopperId($shopperId);
@@ -144,6 +144,16 @@ class ListsService
         $listsArray = $this->listsRepository->getListsByVolunteers(array($volunteerId));
         $listItems = $this->listRequirementsRepository->getAllListItemsInList($listsArray);
         return $listItems;
+    }
+
+    public function getItemStatus($itemId)
+    {
+        $listItem = $this->listRequirementsRepository->find($itemId);
+        if (!$listItem){
+            return null;
+        }
+
+        return $listItem->getStatus();
     }
 
 

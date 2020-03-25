@@ -36,7 +36,7 @@ class ListRequirements
     /**
      * @ORM\Column(type="boolean")
      */
-    private $status;
+    private $status = false;
 
     /**
      * @ORM\Column(type="string", length=8, nullable=true)

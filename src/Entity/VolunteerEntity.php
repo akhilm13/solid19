@@ -52,16 +52,16 @@ class VolunteerEntity
     private $createdAt;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      * @var string $messageToShoppers
      */
-    private $messageToShoppers;
+    private $messageToShoppers = "";
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      * @var string $messageToOtherVolunteers
      */
-    private $messageToOtherVolunteers;
+    private $messageToOtherVolunteers = "";
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Lists", mappedBy="volunteerId")
@@ -210,6 +210,9 @@ class VolunteerEntity
      */
     public function setMessageToShoppers(string $messageToShoppers): void
     {
+        if($messageToShoppers === null){
+            $messageToShoppers = "";
+        }
         $this->messageToShoppers = $messageToShoppers;
     }
 
@@ -226,6 +229,9 @@ class VolunteerEntity
      */
     public function setMessageToOtherVolunteers(string $messageToOtherVolunteers): void
     {
+        if ($messageToOtherVolunteers === null){
+            $messageToOtherVolunteers = "";
+        }
         $this->messageToOtherVolunteers = $messageToOtherVolunteers;
     }
 }

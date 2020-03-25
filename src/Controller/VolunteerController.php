@@ -295,11 +295,38 @@ class VolunteerController extends AbstractController
 
         $message = $volunteerService->getMessageToVolunteers($id);
 
+        if (!$message) {
+            $message = "";
+        }
         return new JsonResponse(array(
             'message' => $message
-        ), Response::HTTP_FOUND);
+        ), Response ::HTTP_FOUND);
 
     }
 
+    /**
+     * @Route("/removeItem/{listItemId}/key/{token}", name="deleteListItem", methods={"DELETE"})
+     * @param $listItemId
+     * @param VolunteerService $volunteerService
+     * @param ListsService $listsService
+     * @param $token
+     * @return JsonResponse
+     * @throws ORMException
+     */
+    public function deleteListItem($listItemId, VolunteerService $volunteerService, ListsService $listsService, $token)
+    {
+        $isAuth = $volunteerService->checkToken($token);
+
+        if (!$isAuth) {
+            return new JsonResponse(array(
+                'status' => 'Not Authorised'
+            ), Response::HTTP_UNAUTHORIZED);
+        }
+
+        $listsService->deleteItem($listItemId);
+        return new JsonResponse(array(
+            'status' => 'deleted'
+        ), Response::HTTP_OK);
+    }
 
 }

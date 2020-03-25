@@ -149,21 +149,7 @@ class ListOrdersController extends AbstractController
         ), Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/removeItem/{listItemId}", name="deleteListItem", methods={"DELETE"})
-     * @param $listItemId
-     * @param ListsService $listsService
-     * @return JsonResponse
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    public function deleteListItem($listItemId, ListsService $listsService)
-    {
-        $listsService->deleteItem($listItemId);
-        return new JsonResponse(array(
-            'status' => 'deleted'
-        ), Response::HTTP_OK);
-    }
+
 
     /**
      * @Route("/listItem/{listItemId}", name="getItem", methods={"GET"})
@@ -220,5 +206,28 @@ class ListOrdersController extends AbstractController
 
 
     }
+
+    /**
+     * @Route("/getStatus/item/{listItemId}", name="getItemStatus", methods={"GET"})
+     * @param ListsService $listsService
+     * @param $listItemId
+     * @return JsonResponse
+     */
+    public function getListItemStatus(ListsService $listsService, $listItemId)
+    {
+        $status = $listsService->getItemStatus($listItemId);
+
+        if ($status === null){
+            return new JsonResponse(array(
+                'status' => "List Item not Found"
+            ), Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(array(
+            'status' => $status
+        ), Response::HTTP_FOUND);
+
+    }
+
 
 }
