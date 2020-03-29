@@ -8,6 +8,7 @@ use App\Service\ListsService;
 use App\Service\VolunteerService;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,9 +33,10 @@ class VolunteerController extends AbstractController
     /**
      * @Route("/signup", name="volunteerSignUp", methods={"POST"})
      * @param Request $request
+     * @param VolunteerService $volunteerService
      * @return JsonResponse
      */
-    public function volunteerSignUpAction(Request $request){
+    public function volunteerSignUpAction(Request $request, VolunteerService $volunteerService){
 
         $volunteerData = json_decode($request->getContent(), true);
 
@@ -46,15 +48,9 @@ class VolunteerController extends AbstractController
             throw new NotFoundHttpException('Mandatory parameters not found');
         }
 
-        $volunteer = new VolunteerEntity();
-        $volunteer->setEmail($email);
-        $volunteer->setPhone($phone);
-        $volunteer->setToken(password_hash($password, PASSWORD_DEFAULT));
-
         try{
-
-            $this->volunteerRepository->saveVolunteerEntity($volunteer);
-        }catch (ORMException $exception){
+            $volunteerService->addNewVolunteeer($email, $password, $phone);
+        }catch (Exception $exception){
             return new JsonResponse(array(
                 'status' => 'failed'
             ), Response::HTTP_NOT_IMPLEMENTED);

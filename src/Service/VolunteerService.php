@@ -4,7 +4,9 @@
 namespace App\Service;
 
 
+use App\Entity\VolunteerEntity;
 use App\Repository\VolunteerEntityRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 
@@ -16,6 +18,24 @@ class VolunteerService
     public function __construct(VolunteerEntityRepository $volunteerRepository)
     {
         $this->volunteerRepository = $volunteerRepository;
+    }
+
+    /**
+     * @param $email
+     * @param $password
+     * @param $phone
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function addNewVolunteeer($email, $password, $phone){
+
+        $volunteer = new VolunteerEntity();
+        $volunteer->setEmail($email);
+        $volunteer->setPhone($phone);
+        $volunteer->setToken(password_hash($password, PASSWORD_DEFAULT));
+
+        $this->volunteerRepository->saveVolunteerEntity($volunteer);
+
     }
 
     public function authenticateVolunteer($email, $password){
