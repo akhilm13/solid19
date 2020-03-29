@@ -9,4 +9,5 @@
 /vendor/
 .idea/
 .env
+/src/Migrations/
 ###< symfony/framework-bundle ###
