@@ -52,7 +52,7 @@ class VolunteerController extends AbstractController
             $volunteerService->addNewVolunteeer($email, $password, $phone);
         }catch (Exception $exception){
             return new JsonResponse(array(
-                'status' => 'failed'
+                'status' => $exception->getMessage()
             ), Response::HTTP_NOT_IMPLEMENTED);
         }
 
@@ -133,9 +133,9 @@ class VolunteerController extends AbstractController
         $listName = $listInfo['listName'];
         try {
             $listsService->createNewList($volunteerId, $listName);
-        } catch (ORMException $e) {
+        } catch (Exception $e) {
             return new JsonResponse(array(
-                'status' => 'Could not create list'
+                'status' => $e->getMessage()
             ), Response::HTTP_NOT_IMPLEMENTED);
         }
 
@@ -172,9 +172,9 @@ class VolunteerController extends AbstractController
 
         try {
             $listsService->createNewListItem($listItemListId, $listItemQuantity, $listItemName);
-        } catch (ORMException $e) {
+        } catch (Exception $e) {
             return new JsonResponse(array(
-                'status' => 'Could not create item'
+                'status' => $e->getMessage()
             ), Response::HTTP_NOT_IMPLEMENTED);
         }
 
