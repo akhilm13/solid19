@@ -88,16 +88,17 @@ class VolunteerController extends AbstractController
     }
 
     /**
-     * @Route("/me/lists/key/{key}/id/{id}", name="getAllListsByVolunteer", methods={"GET"})
+     * @Route("/me/lists/id/{id}", name="getAllListsByVolunteer", methods={"GET"})
+     * @param Request $request
      * @param VolunteerService $volunteerService
      * @param ListsService $listsService
-     * @param $key
      * @param $id
      * @return JsonResponse
      */
-    public function getAllLists(VolunteerService $volunteerService, ListsService $listsService, $key, $id)
+    public function getAllLists(Request $request, VolunteerService $volunteerService, ListsService $listsService, $id)
     {
-        $isAuth = $volunteerService->checkToken($key);
+
+        $isAuth = $volunteerService->checkToken($request);
 
         if (!$isAuth) {
             return new JsonResponse(array(
@@ -119,8 +120,8 @@ class VolunteerController extends AbstractController
      */
     public function addList(Request $request, ListsService $listsService, VolunteerService $volunteerService)
     {
-        $key = json_decode($request->getContent(), true)['key'];
-        $isAuth = $volunteerService->checkToken($key);
+
+        $isAuth = $volunteerService->checkToken($request);
 
         if (!$isAuth) {
             return new JsonResponse(array(
@@ -155,8 +156,7 @@ class VolunteerController extends AbstractController
     public function addListItem(Request $request, ListsService $listsService, VolunteerService $volunteerService)
     {
 
-        $key = json_decode($request->getContent(), true)['key'];
-        $isAuth = $volunteerService->checkToken($key);
+        $isAuth = $volunteerService->checkToken($request);
 
         if (!$isAuth) {
             return new JsonResponse(array(
@@ -185,18 +185,18 @@ class VolunteerController extends AbstractController
     }
 
     /**
-     * @Route("/list/{listId}/key/{token}", name="getList", methods={"GET"})
+     * @Route("/list/{listId}", name="getList", methods={"GET"})
+     * @param Request $request
      * @param ListsService $listsService
      * @param VolunteerService $volunteerService
      * @param $listId
-     * @param $token
      * @return JsonResponse
      */
-    public function getList(ListsService $listsService, VolunteerService $volunteerService, $listId, $token)
+    public function getList(Request $request, ListsService $listsService, VolunteerService $volunteerService, $listId)
     {
         $listItems = $listsService->getAllItemsInList($listId);
 
-        $isAuth = $volunteerService->checkToken($token);
+        $isAuth = $volunteerService->checkToken($request);
 
         if (!$isAuth) {
             return new JsonResponse(array(
@@ -214,15 +214,16 @@ class VolunteerController extends AbstractController
     }
 
     /**
-     * @Route("/params/{id}/key/{token}", name="getVolunteerParams", methods={"GET"})
+     * @Route("/params/{id}", name="getVolunteerParams", methods={"GET"})
+     * @param Request $request
      * @param VolunteerService $volunteerService
      * @param $id
      * @param $token
      * @return JsonResponse
      */
-    public function getVolunteerParams(VolunteerService $volunteerService, $id, $token)
+    public function getVolunteerParams(Request $request, VolunteerService $volunteerService, $id)
     {
-        $isAuth = $volunteerService->checkToken($token);
+        $isAuth = $volunteerService->checkToken($request);
 
         if (!$isAuth) {
             return new JsonResponse(array(
@@ -241,21 +242,20 @@ class VolunteerController extends AbstractController
     }
 
     /**
-     * @Route("/params/{id}/key/{token}", name="addParameters", methods={"POST"})
+     * @Route("/params/{id}/}", name="addParameters", methods={"POST"})
      * @param Request $request
      * @param VolunteerService $volunteerService
      * @param $id
-     * @param $token
      * @return JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function addVolunteerParameters(Request $request, VolunteerService $volunteerService, $id, $token)
+    public function addVolunteerParameters(Request $request, VolunteerService $volunteerService, $id)
     {
+
         $parameters = json_decode($request->getContent(), true);
 
-        $isAuth = $volunteerService->checkToken($token);
-
+        $isAuth = $volunteerService->checkToken($request);
         if (!$isAuth) {
             return new JsonResponse(array(
                 'status' => 'Not Authorised'
@@ -301,17 +301,18 @@ class VolunteerController extends AbstractController
     }
 
     /**
-     * @Route("/removeItem/{listItemId}/key/{token}", name="deleteListItem", methods={"DELETE"})
+     * @Route("/removeItem/{listItemId}", name="deleteListItem", methods={"DELETE"})
+     * @param Request $request
      * @param $listItemId
      * @param VolunteerService $volunteerService
      * @param ListsService $listsService
-     * @param $token
      * @return JsonResponse
      * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function deleteListItem($listItemId, VolunteerService $volunteerService, ListsService $listsService, $token)
+    public function deleteListItem(Request $request, $listItemId, VolunteerService $volunteerService, ListsService $listsService)
     {
-        $isAuth = $volunteerService->checkToken($token);
+        $isAuth = $volunteerService->checkToken($request);
 
         if (!$isAuth) {
             return new JsonResponse(array(

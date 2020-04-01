@@ -9,6 +9,7 @@ use App\Repository\VolunteerEntityRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Symfony\Component\HttpFoundation\Request;
 
 class VolunteerService
 {
@@ -49,8 +50,12 @@ class VolunteerService
         return false;
     }
 
-    public function checkToken($token)
+    public function checkToken(Request $request)
     {
+        if (!$request->headers->has('Authorization')){
+            return false;
+        }
+        $token = $authorizationHeader = $request->headers->get('Authorization');
         return $this->volunteerRepository->checkToken($token);
     }
 
